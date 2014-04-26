@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Content Security Policy and XSS | Ruben Zakaryan</title>
+    
+    <meta name="description" content="This presentation is prepared for OWASP Armenia chapter meetup." />
+    <meta name="author" content="Ruben Zakaryan" />
+
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|PT+Sans:400,700,400italic,700italic|PT+Serif:400,700,400italic,700italic" rel="stylesheet" />
+    <link href="css/impress-demo.css" rel="stylesheet" />
+    
+    <link rel="shortcut icon" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+</head>
+
+<body class="impress-not-supported">
+<div class="fallback-message">
+    <p>Your browser <b>doesn't support the features required</b> by impress.js, so you are presented with a simplified version of this presentation.</p>
+    <p>For the best experience please use the latest <b>Chrome</b>, <b>Safari</b> or <b>Firefox</b> browser.</p>
+</div>
+
+<!--
+Starting here :)
+-->
+<div id="impress">
+    <div id="front" class="step slide front" data-x="-1000" data-y="-1500">
+        <img src="img/owasp-armenia.png" title="OWASP Armenia" />
+        <h2>OWASP Armenia Meetup</h2>
+        <h1>Content Security Policy and XSS</h1>
+        <p>Ruben Zakaryan</p>
+        
+    </div>
+
+    <div id="xss-1" class="step slide xss-1" data-x="0" data-y="-1500">
+        <p>before CSP was</p>
+        <h1>XSS</h1>
+        <p>(Cross-Site Scripting)</p>
+    </div>
+
+    <div id="xss-2" class="step slide xss-2" data-x="1000" data-y="-1500">
+        <p><span class='red'>XSS</span> is:</p>
+        <ul>
+            <li><strong>not</strong> a vulnerability</li>
+            <li>a special case of Code Injection Attack</li>
+            <li>targeting user's web browser, not web servers</li>
+            <li>one of the most common attack types</li>
+            <li>more dangerous than the most people think</li>
+        </ul>
+    </div>
+
+    <div id="xss-3" class="step slide xss-3" data-x="2000" data-y="-1500">
+        <p>The dangers of <span class="red">XSS</span>:</p>
+        <ul>
+            <li>Defacing and fake pages</li>
+            <li>Compromising private information (passwords, credit cards etc)</li>
+            <li>Clickjacking</li>
+            <li>Forcing users to do unexpected things (transfering money, changing passwords, deleting accounts)</li>
+            <li>Stealing authorization cookies (admin privileges on the site, root access to web server)</li>
+            <li>Exploiting user's browser (taking under control users computers)</li>
+            <li> ... et cetera, et cetera, et cetera</li>
+        </ul>
+    </div>
+    <div id="xss-4" class="step slide xss-4" data-x="3000" data-y="-1500">
+        <h1>Classification</h1>
+        <ul>
+            <li>Stored (Persistent) XSS</li>
+            <li>Reflective (Non-Persistent) XSS</li>
+            <li>DOM-based XSS</li>
+    </div>
+
+    <div id="how-it-works" class="step" data-x="0" data-y="0" data-scale="4">
+        <h1>How it works?</h1>
+    </div>
+
+    <div id="demonstrations" class="step" data-x="-1000" data-y="3000" data-rotate="90" data-scale="5">
+        Demonstrations:
+        <ul>
+            <li><a href="demos/demo1.php" target="_blank">Basic XSS example</a></li>
+            <li><a href="demos/demo2.php" target="_blank">DOM-based XSS example</a></li>
+        </ul>
+    </div>
+
+    <div id="stealing-cookies" class="step" data-x="3500" data-y="2100" data-rotate="180" data-scale="6">
+        <h1>Stealing auth cookies</h1>
+        <h3>Wordpress</h3>
+        <p>For this presentation I've simplified the process:</p>
+        <ul>
+            <li>Disabled HTTPONLY cookies</li>
+            <li>Disabled XSS protection</li>
+            <li>Disabled escaping: stripslashes_deep() on output</li>
+        </ul>
+    </div>
+
+    <div id="wordpress-link" class="step" data-x="2825" data-y="2325" data-z="-3000" data-rotate="300" data-scale="1">
+        <h1>Demonstration</h1>
+        <a href="http://localhost/wordpress/" target="_blank">Yet another Wordpress site</a>
+    </div>
+
+    <div id="secure-content" class="step" data-x="5000" data-y="-1500" data-scale="2">
+        <h1>Summary</h1>
+        <ul>
+            <li><span class='red'>XSS</span> is a result of Input Validation Vulnerability.</li>
+            <li>Trusted content is not always trusted.</li>
+            <li>Same Origin Policy can't prevent XSS attacks.</li>
+        </ul>
+    </div>
+
+    <div id="CSP" class="step slide xss-1" data-x="3000" data-y="-1500" data-z="-1000" data-rotate-x="-90">
+        <p>here comes</p>
+        <h1>CSP</h1>
+        <p>(Content Security Policy)</p>
+    </div>
+
+    <div id="csp-2" class="step slide xss-2" data-x="2000" data-y="-1500" data-z="-1000" data-rotate-x="-90">
+        <p><span class='red'>CSP</span></p>
+        <ul>
+            <li>is designed to prevent malicious content injection.</li>
+            <li>allows web application to declare from where it expects to load scripts.</li>
+            <li>doesn't break existing applications functionality and still works.</li>
+        </ul>
+    </div>
+
+    <div id="csp-3" class="step slide xss-2" data-x="1000" data-y="-1500" data-z="-1000" data-rotate-x="-90">
+        <h1><span class="red">CSP</span> headers</h1>
+        <code>
+            <span class="maroon">Content-Security-Policy:</span> <span class="blue">default-src</span> https://cdn.example.net; <span class="blue">frame-src</span> <span class="green">'none';</span> <span class="blue">object-src</span> <span class="green">'none'</span>
+        </code>
+
+        <ul>
+            <li>default-src</li>
+            <li>script-src</li>
+            <li>style-src</li>
+            <li>img-src</li>
+            <li>connect-src</li>
+            <li>frame-src</li>
+            <li>font-src</li>
+            <li>...and more</li>
+        </ul>
+    </div>
+
+    <div id="csp-4" class="step slide xss-2" data-x="0" data-y="-1500" data-z="-1000" data-rotate-x="-90">
+        <h1>Remember always!</h1>
+        <ul>
+            <li><span class="red">Inline script</span> <strong>will be allowed</strong> because inline scripting is commonly used (can be disabled if target site does not use this type of scripting),</li>
+            <li><span class="red">eval()</span> function <strong>will be allowed</strong> in order to not break use of popular JavaScript libraries (ex: JQuery, JQueryUI, Sencha, ...) because they use eval() function (it was the case last time I have checked the source code from CDN&nbsp;;) ),</li>
+        </ul>
+    </div>
+
+    <div id="csp-5" class="step slide xss-2" data-x="-1000" data-y="-1500" data-z="-1000" data-rotate-x="-90">
+        <h1><span class="red">CSP</span> in action</h1>
+
+        <ul>
+            <li><a href="demos/demo3.php" target="_blank">CSP default behavior</a></li>
+            <li><a href="demos/demo4.php" target="_blank">CSP image-src</a></li>
+            <li><a href="demos/demo5.php" target="_blank">CSP default-src</a></li>
+        </ul>
+    </div>
+
+    <div id="csp-6" class="step slide xss-2" data-x="-1000" data-y="-1500" data-z="-2000" data-rotate-x="-90">
+        <h1><span class="red">XSS-auditor</span></h1>
+        <p>XSS-auditor is a browser internal tool for XSS detection and blocking.</p>
+        <p>Enabled by default if no CSP reflected-xss directive or X-XSS-Protection header is set.</p>
+    </div>
+
+
+    <div id="csp-7" class="step slide xss-2" data-x="0" data-y="-1500" data-z="-2000" data-rotate-x="-90">
+        <h1><span class="red">report-uri</span></h1>
+        <code>
+            <span class="maroon">Content-Security-Policy:</span> <span class="blue">report-uri</span> http://example.com/xss_watchdog 
+        </code>
+        <p class="margin-top">If set, browser POSTs policy failure reports to the specified URL</p>
+        <p>Also "-Report-Only" can be added to the end of header name, and it will not block anything</p>
+    </div>
+
+
+    <div id="csp-8" class="step" data-x="1000" data-y="-1500" data-z="-2000" data-rotate-x="-90" scale="1" data-rotate="90">
+        <h1>But wait</h1>
+    </div>
+
+    <div id="csp-9" class="step slide xss-2" data-x="2000" data-y="-1500" data-z="-2000" data-rotate-x="-90">
+        <p>This is not a first-line defence</p>
+        <h1 class="red margin-top">XSS-auditor can be bypassed!</h1>
+    </div>
+
+    <div id="bypassing-1" class="step slide xss-2" data-x="3000" data-y="-1500" data-z="-2000" data-rotate-x="-90">
+        <h1><span class="red">XSS-auditor</span> doesn't always protect</h1>
+        <ul>
+            <li><a href="demos/demo6.php" target="_blank">Bypassing</a></li>
+            <li><a href="demos/demo7.php" target="_blank">Eval is not bypassing</a></li>
+            <li><a href="demos/demo8.php" target="_blank">PHP print_r is dangerous!</a></li>
+            <li><a href="demos/demo9.php" target="_blank">Attributes and JavaScripts</a></li>
+        </ul>
+    </div>
+
+    <div id="bypassing-2" class="step slide xss-2" data-x="4000" data-y="-1500" data-z="-2000" data-rotate-x="-90">
+        <h1>Even more</h1>
+        <ul>
+            <li>XSS auditors are proprietary software, embedded in browsers. And they are different</li>
+            <li><a href="https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet" target="_blank">OWASP XSS CheatSheet</a></li>
+        </ul>
+    </div>
+
+    <div id="bypassing-3" class="step slide xss-2" data-x="-1000" data-y="2500" data-z="-3000" data-rotate-x="-90" data-rotate-y="90">
+        <img src="img/trollface.png" title="Trollface" alt="Troll" id='trollface' />
+    </div>
+
+    <div id="bypassing-4" class="step slide xss-2" data-x="-1500" data-y="2500" data-z="-3000" data-rotate-x="-90" data-rotate-y="180">
+        <p>You can hack websites with the help of</p>
+        <h1 class="red margin-top">XSS-Auditor</h1>
+    </div>
+
+    <div id="bypassing-5" class="step slide xss-2" data-x="-1500" data-y="2500" data-z="-4000" data-rotate-x="-90" data-rotate-y="180">
+        <h1 class="">Demonstration</h1>
+        <a href="demos/demo10.php" target="_blank" class="margin-top">Blocking any script</a>
+    </div>
+
+    <div id="solutions" class="step" data-x="4000" data-y="0" data-z="" data-scale="5">
+        <h1 class="">What to do?</h1>
+    </div>
+
+    <div id="solutions-1" class="step slide" data-x="4000" data-y="0" data-z="-500" data-rotate-x="-90" >
+        <h1 class="">Protection</h1>
+        <ul>
+            <li>Sanitizing Input and Output</li>
+            <li>Validating Input</li>
+            <li>Whitelisting origins</li>
+            <li>Using best practices</li>
+            <li>Avoiding server misconfiguration</li>
+        </ul>
+    </div>
+
+    <div id="solutions-2" class="step slide" data-x="3000" data-y="0" data-z="-500" data-rotate-x="-90" >
+        <h1 class="">Further reading</h1>
+        <ul>
+            <li><a href="http://www.w3.org/TR/CSP/">Content Security Policy 1.0 W3C Candidate recommendation</a></li>
+            <li><a href="http://w3c.github.io/webappsec/specs/content-security-policy/csp-specification.dev.html#relationship-to-x-xss-protection">Content Security Policy 1.1 Editor's draft</a></li>
+            <li><a href="http://content-security-policy.com/">Content Security Policy Reference</a></li>
+            <li><a href="http://caniuse.com/#feat=contentsecuritypolicy">CSP browser support</a></li>
+            <li><a href="http://erlend.oftedal.no/blog/csp/readiness/version-1.1.php">Check your browser for CSP features</a></li>
+            <li><a href="https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet">OWASP XSS Prevention CheatSheet</a></li>
+            <li><a href="https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet">OWASP XSS bypassing cheatsheet</a></li>
+            <li><a href="https://www.owasp.org/index.php/Content_Security_Policy">OWASP Content Security Policy</a> and all related</li>
+            <li><a href="http://www.jsfuck.com/">jsFuck</a></li>
+            <li><a href="http://utf-8.jp/public/aaencode.html">aaencode</a></li>
+            <li><a href="http://ha.ckers.org/xsscalc.html">xss calc</a></li>
+            <li><a href="http://benvinegar.github.io/csp-talk-2013/#1">Good presentation</a></li>
+        </ul>
+    </div>
+
+    <div id="thankyou" class="step" data-x="1000" data-y="0" data-z="-500" data-rotate-x="-90" data-rotate-y="270" >
+        <h1>Thank you</h1>
+        <h2>Ruben Zakaryan &copy; 2014</h2>
+    </div>
+
+    <div id="overview" class="step" data-x="3000" data-y="1500" data-scale="10">
+    </div>
+
+</div>
+
+<!--
+    
+    
+<div class="hint">
+    <p>Use a spacebar or arrow keys to navigate</p>
+</div>
+<script>
+if ("ontouchstart" in document.documentElement) { 
+    document.querySelector(".hint").innerHTML = "<p>Tap on the left or right to navigate</p>";
+}
+</script>
+
+-->
+<script src="js/impress.js"></script>
+<script>
+
+// Detect DOMReady
+if (window.addEventListener) {
+    window.addEventListener('DOMContentLoaded', documentLoaded, false);
+} else {
+    window.attachEvent('onload', documentLoaded);
+}
+// Create timeline and prepare toolbar when DOM is ready
+function documentLoaded(){
+    impress().init();
+    window.img = document.getElementById('trollface');
+    window.addEventListener('impress:stepenter', checkForImg, false);
+}
+
+function checkForImg(e){
+    var el = e.target,
+        id = el.getAttribute('id');
+   if(id && (id == 'bypassing-3' || id=='bypassing-2' || id=='bypassing-4')){
+       window.img.style.display = 'block';
+   } else {
+       window.img.style.display = 'none';
+   }      
+}
+
+</script>
+</body>
+</html>
+

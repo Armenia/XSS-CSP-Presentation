@@ -1,0 +1,30 @@
+body{
+    font-family:sans-serif;
+    color: #EEE;
+    background-color:#272822;
+}
+a {
+    color: #4D4;
+    text-decoration:none;
+    transition: 0.8s;
+}
+img {
+    width:500px;
+}
+a:hover{
+    color:#FD4;
+}
+.content{
+    background-color:#666;
+    padding:10px;
+    border-radius:3px;
+    margin-top:30px;
+    min-height:300px;
+}
+.filename{
+    font-size:0.8em;
+}
+.defaced{
+    font-size:5em;
+    color: red;
+}
